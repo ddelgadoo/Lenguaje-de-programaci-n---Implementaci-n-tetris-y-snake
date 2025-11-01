@@ -1,0 +1,80 @@
+
+class PantallaTetris{
+
+    let pixeles = [[0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                   [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                   [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                   [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                   [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                   [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                   [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                   [0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                   [0,0,0,0,0,0,0,0,0,0,0,0,0,0]];
+
+    def iniciarPantalla(){
+        return "print (pantalla) ";  // Falta hacer stmt de print en parser.stmt
+    }
+
+}
+
+class Controles {
+
+    def abajo(input){ return movimiento_abajo }  // Hacer stmt de input para tiempo de ejec
+    def izquierda(input){ return movimiento_izq }
+    def derecha(input){ return movimiento_derecha }
+
+    }
+
+class Figuras{
+
+    let cuadrado = [[1,1],
+                    [1,1]];
+
+    let ele =  [[1,0],
+                [1,0],
+                [1,1]];
+
+    let te = [[0,1,0],
+              [1,1,1]];
+
+    let palo = [[1,1,1,1]];
+
+    let bomba =  [[0,1,0],
+                  [1,1,1],
+                  [0,1,0]];
+
+}
+
+class Reglas{
+
+    let velocidadDefault = 10;
+    let gameOver = False;
+    let puntuacion = 0;
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

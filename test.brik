@@ -1,0 +1,179 @@
+// -----------------------------------------------------------------
+// snake.brik
+// Un juego de Snake implementado en el lenguaje "Brik".
+// -----------------------------------------------------------------
+
+// --- 1. Clases y Definiciones ---
+class Constantes {
+    let VACIO = 0;
+    let SERPIENTE = 1;
+    let COMIDA = 2;
+
+    // Direcciones [y, x]
+    let ARRIBA = [-1, 0];
+    let ABAJO = [1, 0];
+    let IZQUIERDA = [0, -1];
+    let DERECHA = [0, 1];
+
+    // Dimensiones
+    let ALTO = 12;
+    let ANCHO = 16;
+}
+
+// --- Funcion para dibujar la pantalla ---
+// (La definimos globalmente)
+def dibujarPantalla(pantalla, constantes) {
+    let y = 0;
+    let lineaOutput = "";
+
+    // 1. DIBUJAR EL BORDE SUPERIOR
+    let borde = "+";
+    let x_borde = 0;
+    while (x_borde < constantes.ANCHO) {
+        borde = borde + "--"; // Dos guiones por celda
+        x_borde = x_borde + 1;
+    }
+    borde = borde + "+\n";
+    lineaOutput = lineaOutput + borde;
+
+    // 2. DIBUJAR EL CUERPO DEL JUEGO
+    while (y < constantes.ALTO) {
+        let linea = "|"; // Borde izquierdo
+        let x = 0;
+        while (x < constantes.ANCHO) {
+            let celda = pantalla[y][x];
+
+            if (celda == constantes.VACIO) {
+                linea = linea + " ."; // Espacio y punto
+            } else if (celda == constantes.SERPIENTE) {
+                linea = linea + " #"; // Serpiende con #
+            } else if (celda == constantes.COMIDA) {
+                linea = linea + " @"; // Comida con @
+            }
+            x = x + 1;
+        }
+        linea = linea + "|\n"; // Borde derecho y salto de linea
+        lineaOutput = lineaOutput + linea;
+        y = y + 1;
+    }
+
+    // 3. DIBUJAR EL BORDE INFERIOR
+    lineaOutput = lineaOutput + borde;
+
+    // Imprimimos todo de una vez para reducir el parpadeo
+    print(lineaOutput);
+}
+
+// --- Funcion para crear una pantalla vacia ---
+def crearPantalla(alto, ancho, vacio) {
+    let pantalla = [];
+    let y = 0;
+    while (y < alto) {
+        let fila = [];
+        let x = 0;
+        while (x < ancho) {
+            push_front(fila, vacio); // (push_front o pop_tail da igual, solo la llenamos)
+            x = x + 1;
+        }
+        push_front(pantalla, fila);
+        y = y + 1;
+    }
+    return pantalla;
+}
+
+
+// --- 2. Estado del Juego (Variables Globales) ---
+let constantes = new Constantes;
+let gameOver = false;
+let score = 0;
+
+let serpiente = [[5, 5], [5, 4], [5, 3]];
+let direccion = constantes.DERECHA;
+let comida = [3, 10]; // [y, x]
+let pantalla = crearPantalla(constantes.ALTO, constantes.ANCHO, constantes.VACIO);
+
+
+// -----------------------------------------------------------------
+// --- 3. El Bucle Principal del Juego ---
+// -----------------------------------------------------------------
+
+print("--- Iniciando Snake (usa 'w', 'a', 's', 'd' para moverte) ---");
+sleep(1000);
+
+while (gameOver == false) {
+
+    // --- 3a. Manejar Input ---
+    let tecla = get_key();
+
+    if (tecla == "w") { if (direccion != constantes.ABAJO) { direccion = constantes.ARRIBA; } }
+    if (tecla == "s") { if (direccion != constantes.ARRIBA) { direccion = constantes.ABAJO; } }
+    if (tecla == "a") { if (direccion != constantes.DERECHA) { direccion = constantes.IZQUIERDA; } }
+    if (tecla == "d") { if (direccion != constantes.IZQUIERDA) { direccion = constantes.DERECHA; } }
+
+
+    // --- 3b. Mover la Serpiente ---
+    let cabeza = serpiente[0];
+    let nueva_cabeza = [cabeza[0] + direccion[0], cabeza[1] + direccion[1]];
+
+    // --- 3c. Comprobar Colisiones ---
+
+    // Colision con pared
+    if (nueva_cabeza[0] < 0 || nueva_cabeza[0] >= constantes.ALTO || nueva_cabeza[1] < 0 || nueva_cabeza[1] >= constantes.ANCHO) {
+        gameOver = true;
+    }
+
+    // Colision consigo mismo
+    let i = 0;
+    while(i < len(serpiente)) {
+        let parte = serpiente[i];
+        if (nueva_cabeza[0] == parte[0] && nueva_cabeza[1] == parte[1]) {
+            gameOver = true;
+        }
+        i = i + 1;
+    }
+    if (gameOver) {
+        break;
+    }
+    // Añadir nueva cabeza
+    push_front(serpiente, nueva_cabeza);
+
+    // Colision con comida
+    if (nueva_cabeza[0] == comida[0] && nueva_cabeza[1] == comida[1]) {
+        score = score + 10;
+        // Nueva comida
+        comida = [rand(0, constantes.ALTO - 1), rand(0, constantes.ANCHO - 1)];
+        // (No quitamos la cola, la serpiente crece)
+    } else {
+        // No comio, quitar la cola
+        pop_tail(serpiente);
+    }
+
+
+    // --- 3d. Dibujar el estado actual ---
+
+    // Limpiar la pantalla para el proximo frame
+    pantalla = crearPantalla(constantes.ALTO, constantes.ANCHO, constantes.VACIO);
+
+    // Poner la comida
+    pantalla[comida[0]][comida[1]] = constantes.COMIDA;
+
+    // Poner la serpiente
+    i = 0;
+    while (i < len(serpiente)) {
+        let parte = serpiente[i];
+        pantalla[parte[0]][parte[1]] = constantes.SERPIENTE;
+        i = i + 1;
+    }
+
+    // Limpiar terminal y dibujar
+    clear_screen();
+    print("--- SNAKE en Brik ---");
+    dibujarPantalla(pantalla, constantes);
+    print("Score: " + score);
+
+    // --- 3e. Pausar el juego ---
+    sleep(100); // Pausa de 100ms
+}
+
+print("--- GAME OVER ---");
+print("Puntuacion Final: " + score);

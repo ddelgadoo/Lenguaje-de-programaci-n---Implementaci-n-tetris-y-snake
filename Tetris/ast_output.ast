@@ -1,0 +1,295 @@
+BlockStmt
+  body:
+    ClassStmt
+      name: PantallaTetris
+      attributes:
+        VarDeclStmt
+          varname: pixeles
+          isconstant: False
+          assignedvalue:
+            ArrayExpr
+              elements:
+                ArrayExpr
+                  elements:
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                ArrayExpr
+                  elements:
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                ArrayExpr
+                  elements:
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                ArrayExpr
+                  elements:
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                ArrayExpr
+                  elements:
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                ArrayExpr
+                  elements:
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                ArrayExpr
+                  elements:
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                ArrayExpr
+                  elements:
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                ArrayExpr
+                  elements:
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:0.0)
+      methods:
+        FunctionStmt
+          name: iniciarPantalla
+          params: []
+          body:
+            ReturnStmt
+              value:
+                StringExpr(value:"print (pantalla) ")
+    ClassStmt
+      name: Controles
+      attributes:
+        (no attributes)
+      methods:
+        FunctionStmt
+          name: abajo
+          params: [u'input']
+          body:
+            ReturnStmt
+              value:
+                SymbolExpr(value:movimiento_abajo)
+        FunctionStmt
+          name: izquierda
+          params: [u'input']
+          body:
+            ReturnStmt
+              value:
+                SymbolExpr(value:movimiento_izq)
+        FunctionStmt
+          name: derecha
+          params: [u'input']
+          body:
+            ReturnStmt
+              value:
+                SymbolExpr(value:movimiento_derecha)
+    ClassStmt
+      name: Figuras
+      attributes:
+        VarDeclStmt
+          varname: cuadrado
+          isconstant: False
+          assignedvalue:
+            ArrayExpr
+              elements:
+                ArrayExpr
+                  elements:
+                    NumberExpr(value:1.0)
+                    NumberExpr(value:1.0)
+                ArrayExpr
+                  elements:
+                    NumberExpr(value:1.0)
+                    NumberExpr(value:1.0)
+        VarDeclStmt
+          varname: ele
+          isconstant: False
+          assignedvalue:
+            ArrayExpr
+              elements:
+                ArrayExpr
+                  elements:
+                    NumberExpr(value:1.0)
+                    NumberExpr(value:0.0)
+                ArrayExpr
+                  elements:
+                    NumberExpr(value:1.0)
+                    NumberExpr(value:0.0)
+                ArrayExpr
+                  elements:
+                    NumberExpr(value:1.0)
+                    NumberExpr(value:1.0)
+        VarDeclStmt
+          varname: te
+          isconstant: False
+          assignedvalue:
+            ArrayExpr
+              elements:
+                ArrayExpr
+                  elements:
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:1.0)
+                    NumberExpr(value:0.0)
+                ArrayExpr
+                  elements:
+                    NumberExpr(value:1.0)
+                    NumberExpr(value:1.0)
+                    NumberExpr(value:1.0)
+        VarDeclStmt
+          varname: palo
+          isconstant: False
+          assignedvalue:
+            ArrayExpr
+              elements:
+                ArrayExpr
+                  elements:
+                    NumberExpr(value:1.0)
+                    NumberExpr(value:1.0)
+                    NumberExpr(value:1.0)
+                    NumberExpr(value:1.0)
+        VarDeclStmt
+          varname: bomba
+          isconstant: False
+          assignedvalue:
+            ArrayExpr
+              elements:
+                ArrayExpr
+                  elements:
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:1.0)
+                    NumberExpr(value:0.0)
+                ArrayExpr
+                  elements:
+                    NumberExpr(value:1.0)
+                    NumberExpr(value:1.0)
+                    NumberExpr(value:1.0)
+                ArrayExpr
+                  elements:
+                    NumberExpr(value:0.0)
+                    NumberExpr(value:1.0)
+                    NumberExpr(value:0.0)
+      methods:
+        (no methods)
+    ClassStmt
+      name: Reglas
+      attributes:
+        VarDeclStmt
+          varname: velocidadDefault
+          isconstant: False
+          assignedvalue:
+            NumberExpr(value:10.0)
+        VarDeclStmt
+          varname: gameOver
+          isconstant: False
+          assignedvalue:
+            SymbolExpr(value:False)
+        VarDeclStmt
+          varname: puntuacion
+          isconstant: False
+          assignedvalue:
+            NumberExpr(value:0.0)
+      methods:
+        (no methods)
