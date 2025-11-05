@@ -6,18 +6,18 @@ class BrikClass(object):
         self.methods = methods     # Lista de nodos FunctionStatement
 
     def __repr__(self):
-        # Esto es para que se vea bien si imprimes el entorno
+        # Si se imprime el entorno
         return u"<class {0}>".format(self.name)
 
 class BrikInstance(object):
     """Representa una instancia de una clase 'brik' (un objeto real)."""
     def __init__(self, brik_class):
         self.brik_class = brik_class
-        self.fields = {} # Un diccionario para guardar sus atributos (ej. 'pixeles')
+        self.fields = {} # Un diccionario para guardar atributos (ej. 'pixeles')
 
     def __repr__(self):
-        # Para que se vea bien si lo imprimes
         return u"<instance {0}>".format(self.brik_class.name)
+
 class BrikBoundMethod(object):
     """Representa una funcion que esta 'atada' a una instancia (self)."""
     def __init__(self, instance, function_node):

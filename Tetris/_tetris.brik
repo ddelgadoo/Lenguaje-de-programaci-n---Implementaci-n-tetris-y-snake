@@ -1,0 +1,467 @@
+// -----------------------------------------------------------------
+// tetris.brik
+// -----------------------------------------------------------------
+
+//  1. Clases y Definiciones
+class Constantes {
+    let VACIO = 0;
+    let PIEZA_MOVIL = 1; // La pieza que cae
+    let PIEZA_FIJA = 2;  // Piezas en el fondo
+
+    let ALTO = 20;
+    let ANCHO = 10;
+}
+
+//  2. Piezas (Formas estándar)
+let formas = [
+    // I (Palo)
+    [[0,0,0,0],
+     [1,1,1,1],
+     [0,0,0,0],
+     [0,0,0,0]],
+
+    // O (Cuadrado)
+    [[1,1],
+     [1,1]],
+
+    // T
+    [[0,1,0],
+     [1,1,1],
+     [0,0,0]],
+
+    // L
+    [[1,0,0],
+     [1,1,1],
+     [0,0,0]],
+
+    // J (L-reversa)
+    [[0,0,1],
+     [1,1,1],
+     [0,0,0]],
+
+    // S
+    [[0,1,1],
+     [1,1,0],
+     [0,0,0]],
+
+    // Z
+    [[1,1,0],
+     [0,1,1],
+     [0,0,0]]
+];
+
+//  3. Funciones del Juego
+
+//  Funcion para crear una pantalla vacia
+def crearPantalla(alto, ancho, vacio) {
+    let pantalla = [];
+    let y = 0;
+    while (y < alto) {
+        let fila = [];
+        let x = 0;
+        while (x < ancho) {
+            push_front(fila, vacio);
+            x = x + 1;
+        }
+        push_front(pantalla, fila);
+        y = y + 1;
+    }
+    return pantalla;
+}
+
+//  Funcion para dibujar la pantalla
+def dibujarPantalla(pantalla, constantes) {
+    let y = 0;
+
+    def print_line(content) {
+        print(content);
+    }
+
+    // 1. DIBUJAR EL BORDE SUPERIOR
+    let borde = "+";
+    let x_borde = 0;
+    while (x_borde < constantes.ANCHO) {
+        borde = borde + "--";
+        x_borde = x_borde + 1;
+    }
+    borde = borde + "+";
+    print_line(borde);
+
+    // 2. DIBUJAR EL CUERPO DEL JUEGO
+    while (y < constantes.ALTO) {
+        let linea = "|";
+        let x = 0;
+        while (x < constantes.ANCHO) {
+            let celda = pantalla[y][x];
+
+            if (celda == constantes.VACIO) {
+                linea = linea + " ."; // Vacio
+            } else if (celda == constantes.PIEZA_MOVIL) {
+                linea = linea + " #"; // Pieza cayendo
+            } else if (celda == constantes.PIEZA_FIJA) {
+                linea = linea + " X"; // Pieza fijada
+            }
+            x = x + 1;
+        }
+        linea = linea + "|";
+        print_line(linea);
+        y = y + 1;
+    }
+
+    // 3. DIBUJAR EL BORDE INFERIOR
+    print_line(borde);
+}
+
+//  Funcion para comprobar colisiones
+// Retorna true si la pieza choca con los limites o con piezas fijas
+def colision(pantalla_juego, pieza, pieza_y, pieza_x, constantes) {
+    let py = 0;
+    while(py < len(pieza)) {
+        let px = 0;
+        while(px < len(pieza[py])) {
+
+            //  comprueba si esta parte de la pieza existe (es un 1)
+            if (pieza[py][px] == 1) {
+                let target_y = pieza_y + py;
+                let target_x = pieza_x + px;
+
+                // 1. Colisión con Paredes (Izquierda o Derecha)
+                if (target_x < 0 || target_x >= constantes.ANCHO) {
+                    return true;
+                }
+
+                // 2. Colisión con el Suelo
+                if (target_y >= constantes.ALTO) {
+                    return true;
+                }
+
+                // 3. Colisión con Piezas Fijas (solo si esta dentro del tablero)
+                if (target_y >= 0) {
+                    if (pantalla_juego[target_y][target_x] == constantes.PIEZA_FIJA) {
+                        return true;
+                    }
+                }
+            }
+            px = px + 1;
+        }
+        py = py + 1;
+    }
+    return false; // No hay colisión
+}
+
+//  Funcion para fijar la pieza en el tablero
+def fijarPieza(pantalla_juego, pieza, pieza_y, pieza_x, constantes) {
+    let py = 0;
+    while(py < len(pieza)) {
+        let px = 0;
+        while(px < len(pieza[py])) {
+            if (pieza[py][px] == 1) {
+                let target_y = pieza_y + py;
+                let target_x = pieza_x + px;
+
+                if (target_y >= 0 && target_y < constantes.ALTO && target_x >= 0 && target_x < constantes.ANCHO) {
+                    pantalla_juego[target_y][target_x] = constantes.PIEZA_FIJA;
+                }
+            }
+            px = px + 1;
+        }
+        py = py + 1;
+    }
+    return pantalla_juego;
+}
+
+//  Funcion para limpiar lineas completas
+def limpiarLineas(pantalla_juego, constantes) {
+    let lineas_limpias = 0;
+    let y = 0;
+
+    // 1. Itera cada fila
+    while (y < constantes.ALTO) {
+        let es_linea_completa = true;
+        let x = 0;
+        // 2. Comprueba si la fila esta llena
+        while (x < constantes.ANCHO) {
+            if (pantalla_juego[y][x] == constantes.VACIO) {
+                es_linea_completa = false;
+                break;
+            }
+            x = x + 1;
+        }
+
+        // 3. Si esta llena, la eliminamos
+        if (es_linea_completa) {
+            lineas_limpias = lineas_limpias + 1;
+
+            // "Mueve" todas las filas de arriba hacia abajo
+            let y_mover = y;
+            while (y_mover > 0) {
+                // Copia la fila de arriba a la fila actual
+                let x_copiar = 0;
+                while (x_copiar < constantes.ANCHO) {
+                    pantalla_juego[y_mover][x_copiar] = pantalla_juego[y_mover - 1][x_copiar];
+                    x_copiar = x_copiar + 1;
+                }
+                y_mover = y_mover - 1;
+            }
+
+            // Pone una fila vacia en la parte superior
+            let x_limpio = 0;
+            while (x_limpio < constantes.ANCHO) {
+                pantalla_juego[0][x_limpio] = constantes.VACIO;
+                x_limpio = x_limpio + 1;
+            }
+        }
+        y = y + 1;
+    }
+    return lineas_limpias;
+}
+
+// Funcion para rotar una pieza 90 grados a la derecha
+def rotarPieza(pieza_original) {
+    let alto_original = len(pieza_original);
+    let ancho_original = len(pieza_original[0]);
+
+    // Crear una nueva matriz (rotada) con dimensiones invertidas
+    let pieza_rotada = [];
+    let x_nueva = 0;
+    while(x_nueva < ancho_original) { // El ancho original es el alto de la rotada
+        let fila_nueva = [];
+        let y_nueva = 0;
+        while(y_nueva < alto_original) { // El alto original es el ancho de la rotada
+            push_front(fila_nueva, 0); // Llenar con ceros temporalmente
+            y_nueva = y_nueva + 1;
+        }
+        push_front(pieza_rotada, fila_nueva);
+        x_nueva = x_nueva + 1;
+    }
+
+    // Copiar los valores
+    let y = 0;
+    while(y < alto_original) {
+        let x = 0;
+        while(x < ancho_original) {
+            // [y][x] original se convierte en [x][alto_original - 1 - y] en la rotada
+            // La rotación en matrices es transponer y luego invertir filas/columnas.
+            // Esto es (original_y, original_x) -> (nuevo_x, nuevo_y)
+            // nuevo_x = original_x
+            // nuevo_y = alto_original - 1 - original_y
+            // Pero como se rotan 90 grados a la derecha, las columnas se convierten en filas
+            // y las filas se invierten
+            pieza_rotada[x][alto_original - 1 - y] = pieza_original[y][x];
+            x = x + 1;
+        }
+        y = y + 1;
+    }
+    return pieza_rotada;
+}
+
+
+//  4. Estado del Juego (Variables Globales)
+let constantes = new Constantes;
+let gameOver = false;
+let score = 0;
+let isPaused = false;
+
+// Variables de la pieza
+let pieza_actual = formas[rand(0, 6)];
+let pieza_y = 0;
+let pieza_x = 3; // Centrado (10 / 2) - (aprox 4 / 2)
+
+// Tablero principal
+let pantalla_juego = crearPantalla(constantes.ALTO, constantes.ANCHO, constantes.VACIO);
+
+// Variables de tiempo
+let velocidad_juego = 500; // 500ms por caida
+let acumulador_tiempo = 0;
+let frame_sleep = 20; // 20ms por frame (50 FPS)
+
+
+
+//  5. Pantalla de Inicio y Bucle Principal
+
+
+//  PANTALLA DE INICIO
+clear_screen();
+print("====================================");
+print("        T E T R I S en Brik         ");
+print("====================================");
+print("");
+print("Controles:         Leyenda:");
+print("   [a] Izquierda     # : Pieza Movil");
+print("   [d] Derecha       X : Pieza Fija");
+print("   [s] Bajar Rapido");
+print("   [k] Rotar Pieza");
+print("   [p] Pausa");
+print("");
+print("--- ¡Iniciando en 3 segundos! ---");
+sleep(3000); // Pausa de 3 segundos
+
+
+// BUCLE PRINCIPAL DEL JUEGO
+while (gameOver == false) {
+
+    //  1. Manejar Input
+    let tecla = get_key();
+
+    // Manejo de Pausa
+    if (tecla == "p") {
+        if (isPaused == true) { isPaused = false; } else { isPaused = true; }
+        tecla = ""; // Limpia la tecla
+    }
+
+    // LÓGICA DEL JUEGO (SI NO ESTÁ EN PAUSA)
+    if (isPaused == false) {
+
+        // Input de Movimiento (Horizontal)
+        let nuevo_x = pieza_x;
+        let pieza_rotada_temp = pieza_actual; // Para la rotación
+
+        if (tecla == "a") { nuevo_x = pieza_x - 1; }
+        if (tecla == "d") { nuevo_x = pieza_x + 1; }
+
+        // Manejo de la Rotación
+        if (tecla == "k") {
+            pieza_rotada_temp = rotarPieza(pieza_actual); // Intenta rotar
+            // Comprueba si la rotacion causa colision
+            if (colision(pantalla_juego, pieza_rotada_temp, pieza_y, pieza_x, constantes) == false) {
+                pieza_actual = pieza_rotada_temp; // Acepta rotación
+            }
+        }
+
+        // Comprueba colision horizontal
+        if (colision(pantalla_juego, pieza_actual, pieza_y, nuevo_x, constantes) == false) {
+            pieza_x = nuevo_x;
+        }
+
+        // Input de Movimiento (Vertical )
+        if (tecla == "s") {
+            let siguiente_y = pieza_y + 1;
+            // Solo baja si no hay colision
+            if (colision(pantalla_juego, pieza_actual, siguiente_y, pieza_x, constantes) == false) {
+                pieza_y = siguiente_y;
+            }
+        }
+
+        //  2. Caída por tiempo
+        acumulador_tiempo = acumulador_tiempo + frame_sleep;
+        if (acumulador_tiempo >= velocidad_juego) {
+            acumulador_tiempo = 0;
+
+            let siguiente_y = pieza_y + 1;
+
+            if (colision(pantalla_juego, pieza_actual, siguiente_y, pieza_x, constantes) == true) {
+                //  COLISIÓN DE CAÍDA
+                // Fijar la pieza en el tablero
+                pantalla_juego = fijarPieza(pantalla_juego, pieza_actual, pieza_y, pieza_x, constantes);
+
+                // Limpiar lineas
+                let lineas_hechas = limpiarLineas(pantalla_juego, constantes);
+                score = score + (lineas_hechas * 100);
+
+                // Crear nueva pieza
+                pieza_actual = formas[rand(0, 6)];
+                pieza_y = 0;
+                pieza_x = 3;
+
+                // Comprobar Game Over (si la nueva pieza colisiona al spawnear)
+                if (colision(pantalla_juego, pieza_actual, pieza_y, pieza_x, constantes) == true) {
+                    gameOver = true;
+                }
+
+            } else {
+                // Simplemente baja la pieza
+                pieza_y = siguiente_y;
+            }
+        }
+
+    }
+
+
+    //  3. DIBUJAR
+
+    // 1. Crear pantalla_render copiando pantalla_juego (piezas fijas)
+    let pantalla_render = crearPantalla(constantes.ALTO, constantes.ANCHO, constantes.VACIO);
+    let y_temp = 0;
+    while(y_temp < constantes.ALTO) {
+        let x_temp = 0;
+        while(x_temp < constantes.ANCHO) {
+            pantalla_render[y_temp][x_temp] = pantalla_juego[y_temp][x_temp];
+            x_temp = x_temp + 1;
+        }
+        y_temp = y_temp + 1;
+    }
+
+    // 2. Fijar la pieza movil en pantalla_render
+    let py = 0;
+    while(py < len(pieza_actual)) {
+        let px = 0;
+        while(px < len(pieza_actual[py])) {
+            if (pieza_actual[py][px] == 1) {
+                let target_y = pieza_y + py;
+                let target_x = pieza_x + px;
+
+                if (target_y >= 0 && target_y < constantes.ALTO && target_x >= 0 && target_x < constantes.ANCHO) {
+                    if (pantalla_render[target_y][target_x] == constantes.VACIO) { // Evita sobreescribir piezas fijas
+                        pantalla_render[target_y][target_x] = constantes.PIEZA_MOVIL;
+                    }
+                }
+            }
+            px = px + 1;
+        }
+        py = py + 1;
+    }
+
+    // Renderizado de UI
+    clear_screen();
+    print("--- TETRIS en Brik ---");
+    dibujarPantalla(pantalla_render, constantes);
+
+    let borde_ui = "+--------------------+";
+    print(borde_ui);
+
+    if (isPaused) {
+        print(" ¡PAUSADO! (Presiona 'p')");
+    } else {
+        print(" Controles: [a/d] Mover [k] Rotar [s] Bajar [p] Pausa");
+    }
+
+    print(" Score: " + score);
+    print(borde_ui);
+
+    // Si estamos en pausa, metemos un sleep
+    if (isPaused) {
+        sleep(50);
+    }
+
+    // 4. Pausa del Frame
+    sleep(frame_sleep);
+
+}
+
+print("--- GAME OVER ---");
+print("Puntuacion Final: " + score);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,4 +1,4 @@
-from ast import Stmt
+from Ast1.ast1 import Stmt
 
 class BlockStmt(Stmt):
     def __init__(self, body): # Body es un array

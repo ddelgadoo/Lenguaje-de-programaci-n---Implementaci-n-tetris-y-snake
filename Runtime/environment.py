@@ -23,13 +23,12 @@ def native_len(value):
 
 def native_sleep(ms):
     """Pausa la ejecucion por milisegundos."""
-    # time.sleep usa segundos, asi que convertimos
-    time.sleep(ms / 1000.0)
-    return None # Las funciones nativas pueden no devolver nada
+    time.sleep(ms / 1000.0) # convertir seg a miliseg
+    return None
 
 def native_rand(min_val, max_val):
     """Devuelve un entero aleatorio entre min_val y max_val (incluidos)."""
-    # randrange no incluye el max, asi que sumamos 1
+
     return float(random.randrange(int(min_val), int(max_val) + 1))
 
 def native_clear_screen():
@@ -57,18 +56,16 @@ def native_pop_tail(array):
 def native_get_key():
     """Obtiene una tecla presionada sin bloquear la ejecucion."""
     try:
-        # --- Logica para Windows ---
         if msvcrt.kbhit():
-            # Lee la tecla presionada y la devuelve como string
             return msvcrt.getch().decode('utf-8')
-        return None  # No se presiono tecla
+        return None
 
     except NameError:
-        # --- Logica para Mac/Linux ---
-        # Comprueba si hay datos listos para leer en 'sys.stdin'
+
+
         if select.select([sys.stdin], [], [], 0) == ([sys.stdin], [], []):
-            # Lee un solo caracter
-            # (Requiere configurar la terminal)
+
+
             fd = sys.stdin.fileno()
             old_settings = termios.tcgetattr(fd)
             try:
@@ -77,13 +74,13 @@ def native_get_key():
             finally:
                 termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
             return ch
-        return None  # No se presiono tecla
+        return None
 
 
 
 class Environment(object):
     def __init__(self):
-        # El "cerebro" es un diccionario para guardar variables
+         # Es un diccionario para guardar variables
         self.variables = {}
         self.declare(u"len", BrikNativeFunction(native_len), is_constant=True)
         self.declare(u"sleep", BrikNativeFunction(native_sleep), is_constant=True)
@@ -98,11 +95,6 @@ class Environment(object):
 
     def declare(self, name, value, is_constant):
         """Define una nueva variable (let o const)"""
-        # if name in self.variables:
-        #    raise Exception(u"Variable ya definida: " + name)
-
-        # (Mas tarde guardaremos 'is_constant' para
-        #  prevenir re-asignaciones a 'const')
         self.variables[name] = value
         return value
 
@@ -116,8 +108,6 @@ class Environment(object):
         """Asigna un nuevo valor a una variable ya existente"""
         if name not in self.variables:
             raise Exception(u"Asignacion a variable no definida: " + name)
-
-        # (Mas tarde aqui puedes comprobar si es 'const')
 
         self.variables[name] = value
         return value

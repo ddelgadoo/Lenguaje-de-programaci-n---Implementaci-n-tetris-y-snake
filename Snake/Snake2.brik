@@ -1,1 +1,255 @@
+// -----------------------------------------------------------------
+// snake.brik
+// -----------------------------------------------------------------
 
+// 1. Clases y Definiciones
+class Constantes {
+    let VACIO = 0;
+    let SERPIENTE = 1;
+    let COMIDA = 2;
+    let PODER = 3;
+
+    // Direcciones [y, x]
+    let ARRIBA = [-1, 0];
+    let ABAJO = [1, 0];
+    let IZQUIERDA = [0, -1];
+    let DERECHA = [0, 1];
+
+    // Dimensiones
+    let ALTO = 12;
+    let ANCHO = 16;
+}
+
+// Funcion para dibujar la pantalla
+def dibujarPantalla(pantalla, constantes) {
+    let y = 0;
+
+    def print_line(content) {
+        print(content);
+    }
+
+    // 1. dibujar el borde sup
+    let borde = "+";
+    let x_borde = 0;
+    while (x_borde < constantes.ANCHO) {
+        borde = borde + "--";
+        x_borde = x_borde + 1;
+    }
+    borde = borde + "+";
+    print_line(borde);
+
+    // 2. dibujar el cuerpo del juego
+    while (y < constantes.ALTO) {
+        let linea = "|";
+        let x = 0;
+        while (x < constantes.ANCHO) {
+            let celda = pantalla[y][x];
+
+            if (celda == constantes.VACIO) {
+                linea = linea + " .";
+            } else if (celda == constantes.SERPIENTE) {
+                linea = linea + " #";
+            } else if (celda == constantes.COMIDA) {
+                linea = linea + " @";
+            } else if (celda == constantes.PODER) {
+                linea = linea + " *";
+            }
+            x = x + 1;
+        }
+        linea = linea + "|";
+        print_line(linea);
+        y = y + 1;
+    }
+
+    // 3. dibujar borde inferior
+    print_line(borde);
+}
+
+// funcion para crear una pantalla vacia
+def crearPantalla(alto, ancho, vacio) {
+    let pantalla = [];
+    let y = 0;
+    while (y < alto) {
+        let fila = [];
+        let x = 0;
+        while (x < ancho) {
+            push_front(fila, vacio);
+            x = x + 1;
+        }
+        push_front(pantalla, fila);
+        y = y + 1;
+    }
+    return pantalla;
+}
+
+
+// 2. estado del Juego (variables globales)
+let constantes = new Constantes;
+let gameOver = false;
+let score = 0;
+
+let serpiente = [[5, 5], [5, 4], [5, 3]];
+let direccion = constantes.DERECHA;
+let comida = [3, 10];
+
+let poder = [-1, -1];
+let poder_timer = 0;
+let isPaused = false;
+
+let pantalla = crearPantalla(constantes.ALTO, constantes.ANCHO, constantes.VACIO);
+
+
+
+// 3. Pantalla de inicio y bucle Principal
+
+
+//  pantalla de inicio
+clear_screen();
+print("====================================");
+print("          S N A K E en Brik         ");
+print("====================================");
+print("");
+print("Controles:         Leyenda:");
+print("   [w] Arriba        # : Serpiente");
+print("   [a] Izquierda     @ : Comida (+10 Pts)");
+print("   [s] Abajo         * : Poder (Atravesar)");
+print("   [d] Derecha");
+print("   [p] Pausa");
+print("");
+print("--- ¡Iniciando en 3 segundos! ---");
+sleep(3000); // Pausa de 3 segundos
+
+
+//  Bucle principal
+while (gameOver == false) {
+
+    // 3.1 Manejar inputs
+    let tecla = get_key();
+
+    // manejo de pausa
+    if (tecla == "p") {
+
+        if (isPaused == true) {
+            isPaused = false;
+        } else {
+            isPaused = true;
+        }
+
+        tecla = "";
+    }
+
+    // lógica del juego
+    if (isPaused == false) {
+
+        // Input de movimiento
+        if (tecla == "w") { if (direccion != constantes.ABAJO) { direccion = constantes.ARRIBA; } }
+        if (tecla == "s") { if (direccion != constantes.ARRIBA) { direccion = constantes.ABAJO; } }
+        if (tecla == "a") { if (direccion != constantes.DERECHA) { direccion = constantes.IZQUIERDA; } }
+        if (tecla == "d") { if (direccion != constantes.IZQUIERDA) { direccion = constantes.DERECHA; } }
+
+        // 3.2 Mover la serpiente
+        let cabeza = serpiente[0];
+        let nueva_cabeza = [cabeza[0] + direccion[0], cabeza[1] + direccion[1]];
+
+        // 3.3 Comprobar colisiones
+        if (poder_timer > 0) {
+            // Si el poder está activo: teletransporte
+            if (nueva_cabeza[0] < 0) { nueva_cabeza[0] = constantes.ALTO - 1; }
+            else if (nueva_cabeza[0] >= constantes.ALTO) { nueva_cabeza[0] = 0; }
+            if (nueva_cabeza[1] < 0) { nueva_cabeza[1] = constantes.ANCHO - 1; }
+            else if (nueva_cabeza[1] >= constantes.ANCHO) { nueva_cabeza[1] = 0; }
+        } else {
+            // Poder inactivo: colisión normal
+            if (nueva_cabeza[0] < 0 || nueva_cabeza[0] >= constantes.ALTO || nueva_cabeza[1] < 0 || nueva_cabeza[1] >= constantes.ANCHO) {
+                gameOver = true;
+            }
+        }
+
+        // Colision con cola
+        let i = 0;
+        while(i < len(serpiente)) {
+            let parte = serpiente[i];
+            if (nueva_cabeza[0] == parte[0] && nueva_cabeza[1] == parte[1]) {
+                gameOver = true;
+            }
+            i = i + 1;
+        }
+        if (gameOver) {
+            break;
+        }
+        push_front(serpiente, nueva_cabeza);
+
+        // Lógica para comer
+        let comio_comida = false;
+
+        if (nueva_cabeza[0] == comida[0] && nueva_cabeza[1] == comida[1]) {
+            comio_comida = true;
+            score = score + 10;
+            comida = [rand(0, constantes.ALTO - 1), rand(0, constantes.ANCHO - 1)];
+            if (score % 30 == 0 && poder[0] == -1) {
+                 poder = [rand(0, constantes.ALTO - 1), rand(0, constantes.ANCHO - 1)];
+            }
+        }
+        if (nueva_cabeza[0] == poder[0] && nueva_cabeza[1] == poder[1]) {
+            poder_timer = 50;
+            poder = [-1, -1];
+        }
+        if (comio_comida == false) {
+            pop_tail(serpiente);
+        }
+
+        // Actualización timers
+        if (poder_timer > 0) {
+            poder_timer = poder_timer - 1;
+        }
+
+        // 3.5 Pausa del Tick del Juego
+        sleep(100);
+
+    }
+
+
+    // 3.6 Dibujar (Se ejecuta siempre, pausado o no)
+
+    // Limpiar la pantalla
+    pantalla = crearPantalla(constantes.ALTO, constantes.ANCHO, constantes.VACIO);
+    pantalla[comida[0]][comida[1]] = constantes.COMIDA;
+    if (poder[0] != -1) {
+        pantalla[poder[0]][poder[1]] = constantes.PODER;
+    }
+    i = 0;
+    while (i < len(serpiente)) {
+        let parte = serpiente[i];
+        pantalla[parte[0]][parte[1]] = constantes.SERPIENTE;
+        i = i + 1;
+    }
+
+    // Renderizado de UI
+    clear_screen();
+    print("--- SNAKE en Brik ---");
+    dibujarPantalla(pantalla, constantes);
+
+
+    let borde_ui = "+----------------------------------+";
+    print(borde_ui);
+    print(" Score: " + score);
+
+    if (isPaused) {
+        print(" ¡PAUSADO! (Presiona 'p' para continuar)");
+    } else if (poder_timer > 0) {
+        print(" !PODER ACTIVADO!: " + poder_timer + " !!");
+    } else {
+        print(" Controles: Mover - [w/a/s/d] __ Pausa - [p] ");
+    }
+    print(borde_ui);
+
+    // Si estamos en pausa, le ponemos un sleep
+
+    if (isPaused) {
+        sleep(50);
+    }
+
+}
+
+print("--- GAME OVER ---");
+print("Puntuacion Final: " + score);

@@ -1,4 +1,4 @@
-from Ast1.ast import Expr,Stmt
+from Ast1.ast1 import Expr,Stmt
 from Parser.bindingPowers import BindingPower
 
 

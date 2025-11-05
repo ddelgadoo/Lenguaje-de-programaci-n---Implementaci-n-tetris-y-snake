@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-import Tokens
+import Lexer.Tokens as Tokens
 import re
 
 """CLASSES"""
@@ -26,48 +26,48 @@ class Lexer(object): # Hereda de (object)
         self.source = source
         self.Tokens = []
         self.patterns = [
-            RegexPattern(re.compile(ur"\s+"), skipHandler),                               # ur"\s+" Matches one or more white spaces characters, i.e, \n,\tab, " ", etc.
+            RegexPattern(re.compile(u"\s+"), skipHandler),                               # ur"\s+" Matches one or more white spaces characters, i.e, \n,\tab, " ", etc.
                                                                                          # ur" is the sintax for raw unicode string
 
-            RegexPattern(re.compile(ur"//.*"), commentHandler),                               # ur"//.*" For comment lines like // Hello or //////// hello
+            RegexPattern(re.compile(u"//.*"), commentHandler),                               # ur"//.*" For comment lines like // Hello or //////// hello
 
-            RegexPattern(re.compile(ur'"[^"]*"'), stringHandler),                             # Matches a string enclosed within double quotes: "JIJI jajaja"
+            RegexPattern(re.compile(u'"[^"]*"'), stringHandler),                             # Matches a string enclosed within double quotes: "JIJI jajaja"
 
-            RegexPattern(re.compile(ur"[0-9]+(\.[0-9]+)?"), numberHandler),                   # [0-9]+ Matches a single or more digit numbers from zero to nine.
+            RegexPattern(re.compile(u"[0-9]+(\.[0-9]+)?"), numberHandler),                   # [0-9]+ Matches a single or more digit numbers from zero to nine.
                                                                                              # (\.[0-9]+)?") Is a group that matches the decimal part of the number.
 
-            RegexPattern(re.compile(ur"[a-zA-Z_][a-zA-Z0-9_]*"), symbolHandler),              # [a-zA-Z_] Matches the first character of the identifier
+            RegexPattern(re.compile(u"[a-zA-Z_][a-zA-Z0-9_]*"), symbolHandler),              # [a-zA-Z_] Matches the first character of the identifier
 
-            RegexPattern(re.compile(ur"\["), defaultHandler(Tokens.TokenKind.OPEN_BRAC, u"[")),
-            RegexPattern(re.compile(ur"\]"), defaultHandler(Tokens.TokenKind.CLOSED_BRAC, u"]")),
-            RegexPattern(re.compile(ur"\{"), defaultHandler(Tokens.TokenKind.OPEN_CURL, u"{")),
-            RegexPattern(re.compile(ur"\}"), defaultHandler(Tokens.TokenKind.CLOSED_CURL, u"}")),
-            RegexPattern(re.compile(ur"\("), defaultHandler(Tokens.TokenKind.OPEN_PARENT, u"(")),
-            RegexPattern(re.compile(ur"\)"), defaultHandler(Tokens.TokenKind.CLOSED_PARENT, u")")),
-            RegexPattern(re.compile(ur"=="), defaultHandler(Tokens.TokenKind.EQUAL, u"==")),
-            RegexPattern(re.compile(ur"!="), defaultHandler(Tokens.TokenKind.NOT_EQUAL, u"!=")),
-            RegexPattern(re.compile(ur"="), defaultHandler(Tokens.TokenKind.ASSIGNMENT, u"=")),
-            RegexPattern(re.compile(ur"!"), defaultHandler(Tokens.TokenKind.NOT, u"!")),
-            RegexPattern(re.compile(ur"<="), defaultHandler(Tokens.TokenKind.LESS_EQUAL, u"<=")),
-            RegexPattern(re.compile(ur"<"), defaultHandler(Tokens.TokenKind.LESS, u"<")),
-            RegexPattern(re.compile(ur">="), defaultHandler(Tokens.TokenKind.GREATER_EQUAL, u">=")),
-            RegexPattern(re.compile(ur">"), defaultHandler(Tokens.TokenKind.GREATER, u">")),
-            RegexPattern(re.compile(ur"\|\|"), defaultHandler(Tokens.TokenKind.OR, u"||")),
-            RegexPattern(re.compile(ur"&&"), defaultHandler(Tokens.TokenKind.AND, u"&&")),
-            RegexPattern(re.compile(ur"\."), defaultHandler(Tokens.TokenKind.DOT, u".")),
-            RegexPattern(re.compile(ur";"), defaultHandler(Tokens.TokenKind.SEMICOMMA, u";")),
-            RegexPattern(re.compile(ur":"), defaultHandler(Tokens.TokenKind.COLON, u":")),
-            RegexPattern(re.compile(ur"\?"), defaultHandler(Tokens.TokenKind.QUESTION, u"?")),
-            RegexPattern(re.compile(ur","), defaultHandler(Tokens.TokenKind.COMMA, u",")),
-            RegexPattern(re.compile(ur"\+\+"), defaultHandler(Tokens.TokenKind.PLUS_PLUS, u"++")),
-            RegexPattern(re.compile(ur"--"), defaultHandler(Tokens.TokenKind.MINUS_MINUS, u"--")),
-            RegexPattern(re.compile(ur"\+="), defaultHandler(Tokens.TokenKind.PLUS_EQUAL, u"+=")),
-            RegexPattern(re.compile(ur"-="), defaultHandler(Tokens.TokenKind.MINUS_EQUAL, u"-=")),
-            RegexPattern(re.compile(ur"\+"), defaultHandler(Tokens.TokenKind.PLUS, u"+")),
-            RegexPattern(re.compile(ur"-"), defaultHandler(Tokens.TokenKind.DASH, u"-")),
-            RegexPattern(re.compile(ur"/"), defaultHandler(Tokens.TokenKind.SLASH, u"/")),
-            RegexPattern(re.compile(ur"\*"), defaultHandler(Tokens.TokenKind.STAR, u"*")),
-            RegexPattern(re.compile(ur"%"), defaultHandler(Tokens.TokenKind.PERCENT, u"%")),
+            RegexPattern(re.compile(u"\["), defaultHandler(Tokens.TokenKind.OPEN_BRAC, u"[")),
+            RegexPattern(re.compile(u"\]"), defaultHandler(Tokens.TokenKind.CLOSED_BRAC, u"]")),
+            RegexPattern(re.compile(u"\{"), defaultHandler(Tokens.TokenKind.OPEN_CURL, u"{")),
+            RegexPattern(re.compile(u"\}"), defaultHandler(Tokens.TokenKind.CLOSED_CURL, u"}")),
+            RegexPattern(re.compile(u"\("), defaultHandler(Tokens.TokenKind.OPEN_PARENT, u"(")),
+            RegexPattern(re.compile(u"\)"), defaultHandler(Tokens.TokenKind.CLOSED_PARENT, u")")),
+            RegexPattern(re.compile(u"=="), defaultHandler(Tokens.TokenKind.EQUAL, u"==")),
+            RegexPattern(re.compile(u"!="), defaultHandler(Tokens.TokenKind.NOT_EQUAL, u"!=")),
+            RegexPattern(re.compile(u"="), defaultHandler(Tokens.TokenKind.ASSIGNMENT, u"=")),
+            RegexPattern(re.compile(u"!"), defaultHandler(Tokens.TokenKind.NOT, u"!")),
+            RegexPattern(re.compile(u"<="), defaultHandler(Tokens.TokenKind.LESS_EQUAL, u"<=")),
+            RegexPattern(re.compile(u"<"), defaultHandler(Tokens.TokenKind.LESS, u"<")),
+            RegexPattern(re.compile(u">="), defaultHandler(Tokens.TokenKind.GREATER_EQUAL, u">=")),
+            RegexPattern(re.compile(u">"), defaultHandler(Tokens.TokenKind.GREATER, u">")),
+            RegexPattern(re.compile(u"\|\|"), defaultHandler(Tokens.TokenKind.OR, u"||")),
+            RegexPattern(re.compile(u"&&"), defaultHandler(Tokens.TokenKind.AND, u"&&")),
+            RegexPattern(re.compile(u"\."), defaultHandler(Tokens.TokenKind.DOT, u".")),
+            RegexPattern(re.compile(u";"), defaultHandler(Tokens.TokenKind.SEMICOMMA, u";")),
+            RegexPattern(re.compile(u":"), defaultHandler(Tokens.TokenKind.COLON, u":")),
+            RegexPattern(re.compile(u"\?"), defaultHandler(Tokens.TokenKind.QUESTION, u"?")),
+            RegexPattern(re.compile(u","), defaultHandler(Tokens.TokenKind.COMMA, u",")),
+            RegexPattern(re.compile(u"\+\+"), defaultHandler(Tokens.TokenKind.PLUS_PLUS, u"++")),
+            RegexPattern(re.compile(u"--"), defaultHandler(Tokens.TokenKind.MINUS_MINUS, u"--")),
+            RegexPattern(re.compile(u"\+="), defaultHandler(Tokens.TokenKind.PLUS_EQUAL, u"+=")),
+            RegexPattern(re.compile(u"-="), defaultHandler(Tokens.TokenKind.MINUS_EQUAL, u"-=")),
+            RegexPattern(re.compile(u"\+"), defaultHandler(Tokens.TokenKind.PLUS, u"+")),
+            RegexPattern(re.compile(u"-"), defaultHandler(Tokens.TokenKind.DASH, u"-")),
+            RegexPattern(re.compile(u"/"), defaultHandler(Tokens.TokenKind.SLASH, u"/")),
+            RegexPattern(re.compile(u"\*"), defaultHandler(Tokens.TokenKind.STAR, u"*")),
+            RegexPattern(re.compile(u"%"), defaultHandler(Tokens.TokenKind.PERCENT, u"%")),
         ]
 
     def advanceN(self, n):

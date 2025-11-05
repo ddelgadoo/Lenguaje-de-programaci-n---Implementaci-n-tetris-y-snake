@@ -1,4 +1,4 @@
-from ast import Expr
+from Ast1.ast1 import Expr
 
 
 class NumberExpr(Expr):

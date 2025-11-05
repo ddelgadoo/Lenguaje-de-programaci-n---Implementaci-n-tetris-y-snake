@@ -1,10 +1,27 @@
 # -*- coding: utf-8 -*-
+
 from __future__ import unicode_literals, print_function
+
+
+import sys
+if sys.version_info[0] < 3:
+    try:
+        unicode # Intenta acceder a 'unicode'
+    except NameError:
+
+        unicode = type(u'')
 
 import Ast1.statements as stmts
 import Ast1.expressions as exprs
 from Runtime.environment import Environment
 from Runtime.types import BrikClass, BrikInstance, BrikBoundMethod, BrikNativeFunction, BrikFunction
+
+try:
+    unicode
+except NameError:
+
+    unicode = type(u'')
+
 
 
 class ReturnException(Exception):
@@ -12,12 +29,12 @@ class ReturnException(Exception):
     def __init__(self, value):
         self.value = value
 class BreakException(Exception):
-    """Excepcion especial usada para 'saltar' fuera de un bule."""
+    """Excepcion especial usada para 'saltar' fuera de un bucle."""
     pass
 
-# --- El Despachador (Dispatcher) ---
+# El despachador (Dispatcher)
 
-def evaluate(node, env):  # <-- 2. ACEPTA 'env'
+def evaluate(node, env):
     """
     Funcion principal que "visita" un nodo del AST.
     """
@@ -28,36 +45,46 @@ def evaluate(node, env):  # <-- 2. ACEPTA 'env'
     if visitor is None:
         raise Exception(u"No hay metodo visitante para el nodo: " + node_type)
 
-    return visitor(node, env)  # <-- 3. PASA 'env' AL VISITANTE
+    return visitor(node, env)
 
 
-# --- Visitantes de Sentencias (No devuelven valor) ---
+# Visitantes de Sentencias (No devuelven valor)
 
 def visit_BlockStmt(node, env):
     """Visita un bloque de codigo (lista de sentencias)"""
     for stmt in node.body:
-        evaluate(stmt, env)  # Pasa 'env' a cada sentencia
+        evaluate(stmt, env)
 
 
 def visit_ExpressionStmt(node, env):
     """Visita una expresion (ej. 5 + 10;)"""
-    evaluate(node.expression, env)  # Pasa 'env'
+    evaluate(node.expression, env)
 
 
 def visit_PrintStmt(node, env):
-    """Visita una sentencia 'print'."""
+    """Visita una sentencia 'print' y asegura un salto de línea."""
+
     # 1. Evalua la expresion dentro del print
     valor_a_imprimir = evaluate(node.expression, env)
+    output_str = unicode(valor_a_imprimir)
 
-    # 2. IMPRESION CORREGIDA PARA PYCHARM / PY2.7
-    if isinstance(valor_a_imprimir, basestring):
-        # Si el valor es una cadena (que contiene los \n),
-        # usamos sys.stdout.write en lugar del print por defecto
-        # Esto fuerza al terminal a INTERPRETAR la cadena sin mostrar los \n
-        import sys
-        sys.stdout.write(valor_a_imprimir)
+    # 2. Manejo de la impresión
+    import sys
+
+    if isinstance(valor_a_imprimir, (str, unicode)):
+        # CASO A: Es una cadena (incluye strings simples y el output formateado de Snake)
+
+        # Escribimos la cadena directamente al stdout
+        sys.stdout.write(output_str)
+
+        # Si la cadena NO termina en un salto de línea, lo añadimos
+        if not output_str.endswith(u'\n'):
+            sys.stdout.write(u'\n')
+
     else:
-        # Si es un numero u otra cosa, usa el print normal
+        # CASO B: Es un número u otro tipo (no string)
+        # Aquí usamos el print por defecto, pero con la función print_function
+        # que siempre añade un salto de línea.
         print(valor_a_imprimir)
 
 
@@ -71,7 +98,7 @@ def visit_VarDeclStmt(node, env):
     env.declare(node.varname, value, node.isconstant)
 
 
-# --- Visitantes de Expresiones (SIEMPRE devuelven un valor) ---
+# --- Visitantes de Expresiones  ---
 
 def visit_NumberExpr(node, env):
     """Visita un numero literal (ej. 5)"""
@@ -112,7 +139,7 @@ def visit_AssignmentExpr(node, env):
         instance.fields[property_name] = value
         return value
 
-    # --- INICIO DE LA NUEVA LOGICA ---
+    #
     elif isinstance(node.assign, exprs.IndexAccessExpr):
         # CASO 3: Asignacion a indice (ej. mi_array[0] = 10)
 
@@ -136,14 +163,14 @@ def visit_AssignmentExpr(node, env):
             return value
         except IndexError:
             raise Exception(u"Indice fuera de rango al asignar.")
-    # --- FIN DE LA NUEVA LOGICA ---
+
 
     else:
         # Si no es un simbolo, acceso, o indice, es un error
         raise Exception(u"Asignacion invalida. Solo se puede asignar a un simbolo, propiedad o indice.")
 
 
-# --- NUEVO VISITANTE para '5 + 10' o 'x == y' ---
+
 def visit_BinaryExpr(node, env):
     """Visita una expresion binaria (ej. a + b)"""
 
@@ -156,18 +183,14 @@ def visit_BinaryExpr(node, env):
     # 3. Obtiene el operador (el string, ej. "+", "==")
     op = node.operator.lexeme
 
-    # --- Operaciones Aritmeticas ---
+    # Operaciones Aritmeticas
     if op == u'+':
-        # --- INICIO DE LA CORRECCION ---
-        # 'basestring' es la forma de Python 2 de comprobar
-        # si algo es un 'str' o 'unicode'
-        if isinstance(left, basestring) or isinstance(right, basestring):
+        if isinstance(left, (str, unicode)) or isinstance(right, (str, unicode)):
             # Si uno es un string, convierte ambos a string (unicode)
             return unicode(left) + unicode(right)
         else:
             # Si no, es una suma numerica normal
             return left + right
-        # --- FIN DE LA CORRECCION ---
 
     elif op == u'-':
         return left - right
@@ -180,7 +203,7 @@ def visit_BinaryExpr(node, env):
     elif op == u'%':
         return left % right
 
-    # --- Operaciones de Comparacion ---
+    # Operaciones de Comparacion
     elif op == u'==':
         return left == right
     elif op == u'!=':
@@ -194,7 +217,7 @@ def visit_BinaryExpr(node, env):
     elif op == u'>=':
         return left >= right
 
-    # --- Operaciones Logicas ---
+    # Operaciones Logicas
     elif op == u'&&':
         return left and right
     elif op == u'||':
@@ -249,7 +272,7 @@ def visit_WhileStmt(node, env):
             break
 
         except ReturnException as e:
-            # 4. Si atrapamos 'return', lo relanzamos (no es nuestro problema)
+            # 4. Si atrapamos 'return', lo relanzamos
             raise e
 
         # 5. Vuelve a evaluar la condicion para el proximo ciclo
@@ -270,7 +293,7 @@ def visit_NewExpr(node, env):
     """Visita una expresion 'new ...'"""
 
     # 1. El nodo 'class_name' es un SymbolExpr (ej. 'PantallaTetris')
-    #    No lo evaluamos con evaluate(), solo queremos su nombre.
+    #  solo queremos su nombre.
     class_name = node.class_name.value
 
     # 2. Busca la "plantilla" (BrikClass) en el entorno
@@ -282,14 +305,11 @@ def visit_NewExpr(node, env):
     # 3. Crea la instancia (el objeto real)
     instance = BrikInstance(brik_class)
 
-    # 4. (Importante!) Inicializa los atributos de la instancia
+    # 4. Inicializa los atributos de la instancia
     #    (ej. 'let pixeles = [...]')
     for attr_stmt in brik_class.attributes:
-        # visit_VarDeclStmt anadira 'attr_stmt.varname' al
-        # diccionario 'instance.fields' (cuando lo modifiquemos)
-
-        # --- Temporalmente, creamos un nuevo 'env' para la instancia ---
-        # (Esto lo haremos mas complejo despues)
+        # visit_VarDeclStmt añadira 'attr_stmt.varname' al
+        # diccionario 'instance.fields'
         value = evaluate(attr_stmt.assignedvalue, env)
         instance.fields[attr_stmt.varname] = value
 
@@ -302,21 +322,21 @@ def visit_MemberAccessExpr(node, env):
     # 1. Evalua el objeto de la izquierda para obtener la instancia
     instance = evaluate(node.object, env)
 
-    # 2. Asegurarse de que es una instancia
+    # 2. Asegura de que es una instancia
     if not isinstance(instance, BrikInstance):
         raise Exception(u"No se puede acceder a la propiedad de algo que no es un objeto.")
 
     # 3. Obtener el nombre de la propiedad
     property_name = node.property.value
 
-    # 4. (MODIFICADO) Buscar la propiedad en los 'fields' (atributos)
+    # 4.  Buscar la propiedad en los atributos
     if property_name in instance.fields:
         return instance.fields[property_name]
 
-    # 5. (NUEVO) Si no es un atributo, buscar en los 'methods' de la clase
+    # 5. Si no es un atributo, buscar en los métodos de la clase
     for method_node in instance.brik_class.methods:
         if method_node.name == property_name:
-            # Encontrado! Devolver un metodo 'atado' (bound method)
+            # Encontrado, Devolver un bound method
             # Esto empaqueta la instancia (self) con la funcion
             return BrikBoundMethod(instance, method_node)
 
@@ -328,7 +348,7 @@ def visit_ReturnStatement(node, env):
 
     value = None
     if node.value is not None:
-        # 1. Si hay un valor (ej. return 5;), evalualo
+        # 1. Si hay un valor (ej. return 5;), evalua
         value = evaluate(node.value, env)
 
     # 2. Lanza la excepcion con el valor
@@ -382,9 +402,7 @@ def visit_CallExpr(node, env):
             return_value = e.value
         return return_value
 
-    # --- INICIO DEL NUEVO CODIGO (CASO 3) ---
-
-    # --- CASO 3: Es una funcion global de Brik (ej. dibujarPantalla(...)) ---
+    # CASO 3: Es una funcion global de Brik (ej. dibujarPantalla(...))
     if isinstance(callee, BrikFunction):
 
         function_node = callee.function  # El nodo FunctionStatement
@@ -417,8 +435,6 @@ def visit_CallExpr(node, env):
         except ReturnException as e:
             return_value = e.value
         return return_value
-
-    # --- FIN DEL NUEVO CODIGO ---
 
     # Si no es ninguno de los tres tipos
     raise Exception(u"No se puede 'llamar' a algo que no es un metodo o funcion nativa.")
@@ -470,8 +486,6 @@ def visit_PrefixExpr(node, env):
     if op == u'-':
         # Asumiendo que 'value' es un numero
         return -value
-
-    # (Mas tarde podriamos anadir '!' para 'not')
 
     raise Exception(u"Operador prefijo no implementado: " + op)
 
