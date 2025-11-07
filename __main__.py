@@ -47,7 +47,7 @@ def elegir_juego():
 
         if opcion == "1":
             print(u"Cargando Snake...")
-            return u"Snake\Snake2.brik"
+            return u"Snake\snake.brik"
         elif opcion == "2":
             print(u"Cargando Tetris...")
             return u"Tetris\_tetris.brik"

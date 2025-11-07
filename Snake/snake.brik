@@ -1,0 +1,139 @@
+// -----------------------------------------------------------------
+// snake.brik
+// Un juego de Snake implementado en el lenguaje "Brik"
+// -----------------------------------------------------------------
+
+// --- 1. Clases y Definiciones ---
+class Constantes {
+    let VACIO = 0;
+    let SERPIENTE = 1;
+    let COMIDA = 2;
+
+    // Direcciones [y, x]
+    let ARRIBA = [-1, 0];
+    let ABAJO = [1, 0];
+    let IZQUIERDA = [0, -1];
+    let DERECHA = [0, 1];
+    // Dimensiones
+    let ALTO = 12;
+    let ANCHO = 16;
+}
+
+// --- Funcion para dibujar la pantalla ---
+
+// --- Funcion para crear una pantalla vacia ---
+def crearPantalla(alto, ancho, vacio) {
+    let pantalla = [];
+    let y = 0;
+    while (y < alto) {
+        let fila = [];
+        let x = 0;
+        while (x < ancho) {
+            push_front(fila, vacio);
+            x = x + 1;
+        }
+        push_front(pantalla, fila);
+        y = y + 1;
+    }
+    return pantalla;
+}
+
+
+// --- 2. Estado del Juego (Variables Globales) ---
+let constantes = new Constantes;
+let gameOver = false;
+let score = 0;
+
+// *** CORRECCIÓN PARA EVITAR COLISIÓN INMEDIATA ***
+// La serpiente comienza en la columna 3 (más a la izquierda).
+let serpiente = [[5, 3], [5, 2], [5, 1]];
+let direccion = constantes.DERECHA;
+let comida = [3, 10]; // [y, x]
+let pantalla = crearPantalla(constantes.ALTO, constantes.ANCHO, constantes.VACIO);
+
+
+// -----------------------------------------------------------------
+// --- 3. Bucle Principal del Juego ---
+// -----------------------------------------------------------------
+
+print("--- Iniciando Snake (usa 'w', 'a', 's', 'd' para moverte) ---");
+sleep(1000);
+
+while (gameOver == false) {
+
+    // --- 3a. Manejar Input ---
+    let tecla = get_key();
+    if (tecla == "w") { if (direccion != constantes.ABAJO) { direccion = constantes.ARRIBA;
+    } }
+    if (tecla == "s") { if (direccion != constantes.ARRIBA) { direccion = constantes.ABAJO;
+    } }
+    if (tecla == "a") { if (direccion != constantes.DERECHA) { direccion = constantes.IZQUIERDA;
+    } }
+    if (tecla == "d") { if (direccion != constantes.IZQUIERDA) { direccion = constantes.DERECHA;
+    } }
+
+
+    // --- 3b. Mover la Serpiente ---
+    let cabeza = serpiente[0];
+    let nueva_cabeza = [cabeza[0] + direccion[0], cabeza[1] + direccion[1]];
+
+    // --- 3c. Comprobar Colisiones ---
+
+    // Colision con pared
+    if (nueva_cabeza[0] < 0 || nueva_cabeza[0] >= constantes.ALTO || nueva_cabeza[1] < 0 || nueva_cabeza[1] >= constantes.ANCHO) {
+        gameOver = true;
+    }
+
+    // Colision consigo mismo
+    let i = 0;
+    while(i < len(serpiente)) {
+        let parte = serpiente[i];
+        if (nueva_cabeza[0] == parte[0] && nueva_cabeza[1] == parte[1]) {
+            gameOver = true;
+        }
+        i = i + 1;
+    }
+    if (gameOver) {
+        break;
+    }
+
+    // Añadir nueva cabeza
+    push_front(serpiente, nueva_cabeza);
+
+    // Colision con comida
+    if (nueva_cabeza[0] == comida[0] && nueva_cabeza[1] == comida[1]) {
+        score = score + 10;
+
+    // Nueva comida
+        comida = [rand(0, constantes.ALTO - 1), rand(0, constantes.ANCHO - 1)];
+    // (No quitamos la cola, la serpiente crece)
+    } else {
+        // No comio, quitar la cola
+        pop_tail(serpiente);
+    }
+
+
+    // --- 3d. Dibujar el estado actual ---
+
+    // Limpiar la pantalla para el proximo frame
+    pantalla = crearPantalla(constantes.ALTO, constantes.ANCHO, constantes.VACIO);
+    // Poner la comida
+    pantalla[comida[0]][comida[1]] = constantes.COMIDA;
+
+    // Poner la serpiente
+    i = 0;
+    while (i < len(serpiente)) {
+        let parte = serpiente[i];
+        pantalla[parte[0]][parte[1]] = constantes.SERPIENTE;
+        i = i + 1;
+    }
+
+    // Llama al Motor Gráfico Nativa
+    draw_grid(pantalla, constantes, score);
+
+    // --- 3e. Pausar el juego ---
+    sleep(100); // Pausa de 100ms
+}
+
+print("--- GAME OVER ---");
+print("Puntuacion Final: " + score);
